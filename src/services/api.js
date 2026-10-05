@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "https://todo-server-hn5x.onrender.com/todos";
+const API_URL = "https://todo-server-hn5x.onrender.com/";
 
 export const getTodos = () => axios.get(API_URL);
 
