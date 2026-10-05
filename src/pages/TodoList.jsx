@@ -8,23 +8,32 @@ function TodoList() {
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("All");
 
-  const completedCount = todos.filter((todo) => todo.status === "Completed").length;
-  const activeCount = todos.filter((todo) => todo.status !== "Completed").length;
+  const safeTodos = Array.isArray(todos) ? todos : [];
+
+  const completedCount = safeTodos.filter((todo) => todo.status === "Completed").length;
+  const activeCount = safeTodos.filter((todo) => todo.status !== "Completed").length;
 
   const filteredTodos =
     filter === "All"
-      ? todos
+      ? safeTodos
       : filter === "Completed"
-        ? todos.filter((todo) => todo.status === "Completed")
-        : todos.filter((todo) => todo.status !== "Completed");
+        ? safeTodos.filter((todo) => todo.status === "Completed")
+        : safeTodos.filter((todo) => todo.status !== "Completed");
 
   const fetchTodos = async () => {
     try {
       const response = await getTodos();
-      setTodos(response.data);
+      const payload = Array.isArray(response?.data)
+        ? response.data
+        : Array.isArray(response?.data?.todos)
+          ? response.data.todos
+          : [];
+
+      setTodos(payload);
     } catch (error) {
       console.error(error);
       alert("Failed to load todos");
+      setTodos([]);
     } finally {
       setLoading(false);
     }
@@ -94,7 +103,7 @@ function TodoList() {
             {option}
             <span className="filter-count">
               {option === 'All'
-                ? todos.length
+                ? safeTodos.length
                 : option === 'Active'
                   ? activeCount
                   : completedCount}
